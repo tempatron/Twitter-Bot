@@ -11,7 +11,8 @@ ACCESS_SECRET = 'DD'
 
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
-api = tweepy.API(auth)
+api = tweepy.API(auth,
+                 wait_on_rate_limit=True)  # wait on rate limit allows it wait else it crashed if API limit reaches
 
 mentions = api.mentions_timeline()
 
@@ -49,7 +50,7 @@ def reply_to_helloworld():
         last_seen_id,
         tweet_mode='extended')
     for mention in reversed(mentions):
-        print(str(mention.id) + ' - ' + mention.full_text)
+        print(str(mention.id) + ' -h ' + mention.full_text)
         last_seen_id = mention.id
         store_last_seen_id(last_seen_id, FILE_NAME)
         if '#helloworld' in mention.full_text.lower():
@@ -67,10 +68,11 @@ def reply_to_chaipeelo():
         last_seen_id,
         tweet_mode='extended')
     for mention in reversed(mentions):
-        print(str(mention.id) + ' - ' + mention.full_text)
+        print(str(mention.id) + ' -c ' + mention.full_text)
         last_seen_id = mention.id
         store_last_seen_id(last_seen_id, FILE_NAME)
         if '#chaipeelo' in mention.full_text.lower():
+
             print('#ChaiPeelo found ')
             print('responding back..')
             api.update_status('@' + mention.user.screen_name +
@@ -78,7 +80,11 @@ def reply_to_chaipeelo():
 
 
 while True:
-    reply_to_helloworld()
-    time.sleep(15)
-    reply_to_chaipeelo()
-    time.sleep(15)
+    try:
+        reply_to_helloworld()
+        time.sleep(15)
+        reply_to_chaipeelo()
+        time.sleep(15)
+    except tweepy.TweepError:
+        time.sleep(2)
+        continue

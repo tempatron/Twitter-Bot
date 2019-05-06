@@ -41,13 +41,6 @@ def store_last_seen_id(last_seen_id, file_name):
     return
 
 
-d0 = date(2019, 12, 31)
-d1 = date(2019, 5, 6)
-delta = d0 - d1
-
-print(delta.days)
-
-
 def reply_to_helloworld():
     print('Retrieving and replying to tweets...')
     last_seen_id = retrieve_last_seen_id(FILE_NAME)
@@ -78,9 +71,9 @@ def reply_to_helloworld():
         if '#year' in mention.full_text.lower():
             print('#year found ')
             print('responding back..')
-            print('Result '+result)
+            print('Result ' + result)
             api.update_status('@' + mention.user.screen_name + " " +
-                              result+"% has passed", mention.id)
+                              result + "% has passed", mention.id)
         if '#chaipeelo' in mention.full_text.lower():
             print('#ChaiPeelo found ')
             print('responding back..')

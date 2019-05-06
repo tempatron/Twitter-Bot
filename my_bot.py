@@ -1,5 +1,7 @@
 import tweepy
 import time
+from datetime import date
+import datetime
 
 print('my twitter bot')
 
@@ -39,6 +41,13 @@ def store_last_seen_id(last_seen_id, file_name):
     return
 
 
+d0 = date(2019, 12, 31)
+d1 = date(2019, 5, 6)
+delta = d0 - d1
+
+print(delta.days)
+
+
 def reply_to_helloworld():
     print('Retrieving and replying to tweets...')
     last_seen_id = retrieve_last_seen_id(FILE_NAME)
@@ -53,26 +62,26 @@ def reply_to_helloworld():
         print(str(mention.id) + ' -h ' + mention.full_text)
         last_seen_id = mention.id
         store_last_seen_id(last_seen_id, FILE_NAME)
+        now = datetime.datetime.now()
+        d0 = date(2019, 12, 31)
+        d1 = date(now.year, now.month, now.day)
+        delta = d0 - d1
+
+        result = 364 - delta.days
+
+        result = str(((result / 364) * 100).__round__(0))
         if '#helloworld' in mention.full_text.lower():
             print('found #helloworld!')
             print('responding back..')
             api.update_status('@' + mention.user.screen_name +
                               '#HelloWorld back to you!!', mention.id)
-
-
-def reply_to_chaipeelo():
-    print('Retrieving and replying to tweets...')
-    last_seen_id = retrieve_last_seen_id(FILE_NAME)
-
-    mentions = api.mentions_timeline(
-        last_seen_id,
-        tweet_mode='extended')
-    for mention in reversed(mentions):
-        print(str(mention.id) + ' -c ' + mention.full_text)
-        last_seen_id = mention.id
-        store_last_seen_id(last_seen_id, FILE_NAME)
+        if '#year' in mention.full_text.lower():
+            print('#year found ')
+            print('responding back..')
+            print('Result '+result)
+            api.update_status('@' + mention.user.screen_name + " " +
+                              result+"% has passed", mention.id)
         if '#chaipeelo' in mention.full_text.lower():
-
             print('#ChaiPeelo found ')
             print('responding back..')
             api.update_status('@' + mention.user.screen_name +
@@ -82,9 +91,7 @@ def reply_to_chaipeelo():
 while True:
     try:
         reply_to_helloworld()
-        time.sleep(15)
-        reply_to_chaipeelo()
-        time.sleep(15)
+        time.sleep(10)
     except tweepy.TweepError:
         time.sleep(2)
         continue
